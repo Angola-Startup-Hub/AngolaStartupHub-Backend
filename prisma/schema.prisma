@@ -1,0 +1,99 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // ligação com pooling (Neon: host com -pooler)
+  directUrl = env("DATABASE_URL_UNPOOLED") // ligação directa, usada nas migrações
+}
+
+model Noticia {
+  id              Int       @id @default(autoincrement())
+  titulo          String
+  resumo          String?
+  corpo           String?
+  categoria       String?
+  status          String    @default("rascunho") // rascunho | publicado | agendado
+  dataPublicacao  DateTime?
+  capa            String?
+  destaque        Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([status])
+}
+
+model Evento {
+  id         Int       @id @default(autoincrement())
+  nome       String
+  tipo       String?
+  dataHora   DateTime?
+  local      String?
+  descricao  String?
+  status     String    @default("rascunho") // rascunho | publicado
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([status])
+}
+
+model Programa {
+  id         Int       @id @default(autoincrement())
+  nome       String
+  descricao  String?
+  prazo      DateTime?
+  link       String?
+  status     String    @default("rascunho") // rascunho | publicado
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+model Mensagem {
+  id         Int      @id @default(autoincrement())
+  nome       String
+  email      String
+  assunto    String
+  mensagem   String
+  resposta   String?
+  status     String   @default("por-responder") // por-responder | respondida
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([status])
+}
+
+model Avaliacao {
+  id         Int      @id @default(autoincrement())
+  startup    String
+  fundador   String
+  email      String
+  telefone   String
+  sector     String
+  provincia  String
+  respostas  Json?
+  pontuacao  Float?
+  notas      String?
+  status     String   @default("por-rever") // por-rever | revista | contactada
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([status])
+}
+
+model Subscritor {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  status     String   @default("activo") // activo | cancelado
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+// Redes sociais: uma linha por plataforma (facebook, instagram, linkedin, x, youtube, tiktok, whatsapp, website)
+model RedeSocial {
+  plataforma String   @id
+  url        String
+  ativo      Boolean  @default(true)
+  updatedAt  DateTime @updatedAt
+}
