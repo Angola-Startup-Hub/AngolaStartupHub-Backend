@@ -32,6 +32,8 @@ model Evento {
   dataHora   DateTime?
   local      String?
   descricao  String?
+  capa       String?
+  destaque   Boolean   @default(false)
   status     String    @default("rascunho") // rascunho | publicado
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt

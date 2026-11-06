@@ -22,7 +22,7 @@ const TYPES = {
   noticias: { model: "noticia", status: ["rascunho", "publicado", "agendado"],
     schema: z.object({ titulo: str, resumo: opt, corpo: opt, categoria: opt, dataPublicacao: date, capa: opt, destaque: z.boolean().optional() }) },
   eventos: { model: "evento", status: ["rascunho", "publicado"],
-    schema: z.object({ nome: str, tipo: opt, dataHora: date, local: opt, descricao: opt }) },
+    schema: z.object({ nome: str, tipo: opt, dataHora: date, local: opt, descricao: opt, capa: opt, destaque: z.boolean().optional() }) },
   programas: { model: "programa", status: ["rascunho", "publicado"],
     schema: z.object({ nome: str, descricao: opt, prazo: date, link: opt }) },
   mensagens: { model: "mensagem", status: ["por-responder", "respondida"],
@@ -51,6 +51,14 @@ app.get("/", (_req, res) => res.json({ ok: true, service: "angola-startup-api" }
 app.get("/api/public/:type(noticias|eventos|programas)", wrap(async (req, res) => {
   const t = TYPES[req.params.type];
   res.json(await prisma[t.model].findMany({ where: { status: "publicado" }, orderBy: { createdAt: "desc" } }));
+}));
+app.get("/api/public/noticias/:id(\\d+)", wrap(async (req, res) => {
+  const n = await prisma.noticia.findFirst({ where: { id: Number(req.params.id), status: "publicado" } });
+  n ? res.json(n) : res.status(404).json({ error: "Notícia não encontrada" });
+}));
+app.get("/api/public/eventos/:id(\\d+)", wrap(async (req, res) => {
+  const e = await prisma.evento.findFirst({ where: { id: Number(req.params.id), status: "publicado" } });
+  e ? res.json(e) : res.status(404).json({ error: "Evento não encontrado" });
 }));
 app.get("/api/public/redes", wrap(async (_req, res) => {
   res.json(await prisma.redeSocial.findMany({ where: { ativo: true }, select: { plataforma: true, url: true } }));
@@ -130,6 +138,11 @@ admin.post("/uploads/presign", wrap(async (req, res) => {
 
 admin.get("/subscritores", wrap(async (_req, res) => {
   res.json(await prisma.subscritor.findMany({ orderBy: { createdAt: "desc" } }));
+}));
+
+admin.delete("/subscritores/:id", wrap(async (req, res) => {
+  await prisma.subscritor.delete({ where: { id: Number(req.params.id) } });
+  res.status(204).end();
 }));
 
 admin.post("/mensagens/:id/responder", wrap(async (req, res, next) => {
