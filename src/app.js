@@ -22,7 +22,7 @@ const TYPES = {
   noticias: { model: "noticia", status: ["rascunho", "publicado", "agendado"],
     schema: z.object({ titulo: str, resumo: opt, corpo: opt, categoria: opt, dataPublicacao: date, capa: opt, destaque: z.boolean().optional() }) },
   eventos: { model: "evento", status: ["rascunho", "publicado"],
-    schema: z.object({ nome: str, tipo: opt, dataHora: date, local: opt, descricao: opt, capa: opt, destaque: z.boolean().optional() }) },
+    schema: z.object({ nome: str, tipo: opt, dataHora: date, local: opt, descricao: opt, resumo: opt, capa: opt, destaque: z.boolean().optional() }) },
   programas: { model: "programa", status: ["rascunho", "publicado"],
     schema: z.object({ nome: str, descricao: opt, prazo: date, link: opt }) },
   mensagens: { model: "mensagem", status: ["por-responder", "respondida"],
